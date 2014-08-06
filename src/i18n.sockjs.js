@@ -1,19 +1,19 @@
 angular.module('i18n.gateways', [])
-    .factory('i18nMessageReader', ['topicRegistry', 'sockJS', I18nMessageReaderFactory])
+    .factory('i18nMessageReader', ['sockJS', 'ngRegisterTopicHandler', I18nMessageReaderFactory])
     .factory('i18nMessageWriter', ['restServiceHandler', 'topicRegistry', I18nMessageWriterFactory]);
 
-function I18nMessageReaderFactory(topicRegistry, sockJS) {
+function I18nMessageReaderFactory(sockJS, ngRegisterTopicHandler) {
     return function(ctx, onSuccess, onError) {
         var handlers = {
             ok: function(data) {
                 onSuccess(data.payload.msg)
             }
         };
-        topicRegistry.subscribe('i18n.translated.'+ctx.code, function(data) {
+        ngRegisterTopicHandler(ctx, 'i18n.translated.'+ctx.code, function(data) {
             var handler = handlers[data.subject] || onError;
             handler(data);
         });
-        topicRegistry.subscribe('sockjs.loaded', function() {
+        ngRegisterTopicHandler(ctx, 'sockjs.loaded', function() {
             sockJS.send({
                 topic:'i18n.translate',
                 responseAddress:'i18n.translated.'+ctx.code,
