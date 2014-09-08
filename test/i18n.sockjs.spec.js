@@ -36,46 +36,28 @@ describe('i18n.sockjs.js', function() {
             translation = undefined;
         });
 
-        describe('on sockjs.loaded', function() {
-            beforeEach(function() {
-                topicRegistryMock['sockjs.loaded']('ok');
+        it('send a message over sockjs', function() {
+            expect(sockJS.data).toEqual({
+                topic:'i18n.translate',
+                responseAddress: 'i18n.translated.1',
+                payload: {
+                    namespace:'N',
+                    locale:'L',
+                    key:'C'
+                }
             });
-
-            it('send a message over sockjs', function() {
-                expect(sockJS.data).toEqual({
-                    topic:'i18n.translate',
-                    responseAddress: 'i18n.translated.C',
-                    payload: {
-                        namespace:'N',
-                        locale:'L',
-                        key:'C'
-                    }
-                });
-            })
         });
 
-        describe('on i18n.translated', function() {
-            describe('with ok', function() {
-                beforeEach(function() {
-                    topicRegistryMock['i18n.translated.C']({subject:'ok', payload:{msg:'M'}})
-                });
+        it('when response is ok', function() {
+            sockJS.callback()({subject:'ok', payload:{msg:'M'}});
+            expect(status).toEqual('ok');
+            expect(translation).toEqual('M');
+        });
 
-                it('success handler is called with translation', function() {
-                    expect(status).toEqual('ok');
-                    expect(translation).toEqual('M');
-                })
-            });
-
-            describe('with error', function() {
-                beforeEach(function() {
-                    topicRegistryMock['i18n.translated.C']({subject:'error'});
-                });
-
-                it('error handler is called', function() {
-                    expect(status).toEqual('error');
-                    expect(translation).toBeUndefined();
-                })
-            });
+        it('when response is error', function() {
+            sockJS.callback()({subject:'error'});
+            expect(status).toEqual('error');
+            expect(translation).toBeUndefined();
         });
     });
 
@@ -207,9 +189,16 @@ angular.module('sockjs.mock', [])
     .factory('sockJS', [SockJSFactory]);
 
 function SockJSFactory() {
+    var callback;
     return {
+        callback: function() {return callback},
         send: function(data) {
             this.data = data;
+            return {
+                then: function(cb) {
+                    callback = cb;
+                }
+            }
         }
     }
 }
