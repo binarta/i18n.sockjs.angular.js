@@ -15,7 +15,6 @@ function I18nMessageReaderFactory(sockJS) {
             responseAddress:'i18n.translated.'+(++counter),
             payload:{namespace:ctx.namespace, locale:ctx.locale, key:ctx.code}
         }).then(function(data) {
-            console.log('cb');
             var handler = handlers[data.subject] || onError;
             handler(data);
         })
