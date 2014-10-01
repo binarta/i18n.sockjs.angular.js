@@ -1,6 +1,17 @@
 angular.module('i18n.gateways', [])
     .factory('i18nMessageReader', ['sockJS', I18nMessageReaderFactory])
-    .factory('i18nMessageWriter', ['restServiceHandler', 'topicRegistry', I18nMessageWriterFactory]);
+    .factory('i18nMessageWriter', ['restServiceHandler', 'topicRegistry', I18nMessageWriterFactory])
+    .run(function(installRestDefaultHeaderMapper, topicRegistry) {
+        var locale = 'default';
+        topicRegistry.subscribe('i18n.locale', function(msg) {
+            locale = msg;
+        });
+        installRestDefaultHeaderMapper(function(headers) {
+            headers['accept-language'] = locale;
+            return headers;
+        })
+    })
+;
 
 function I18nMessageReaderFactory(sockJS) {
     var counter = 0;

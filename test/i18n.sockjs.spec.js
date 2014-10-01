@@ -12,6 +12,48 @@ describe('i18n.sockjs.js', function() {
         topicMessageDispatcher = _topicMessageDispatcher_;
     }));
 
+    describe('on module load', function() {
+        var headers, returnedHeaders;
+
+        it('then a default header mapper should be installed', inject(function(installRestDefaultHeaderMapper) {
+            expect(installRestDefaultHeaderMapper.calls[0].args[0]).toBeDefined();
+        }));
+
+        describe('given locale is not broadcasted', function() {
+            beforeEach(inject(function(installRestDefaultHeaderMapper) {
+                headers = {};
+                returnedHeaders = installRestDefaultHeaderMapper.calls[0].args[0](headers);
+            }));
+
+            it('then accept-language header is default', function() {
+                expect(headers['accept-language']).toEqual('default');
+            });
+
+            it('then returned headers are source headers', function() {
+                expect(returnedHeaders).toEqual(headers);
+            });
+        });
+
+        describe('given locale is broadcasted', function() {
+
+            beforeEach(inject(function(installRestDefaultHeaderMapper, topicRegistryMock) {
+                headers = {};
+
+                topicRegistryMock['i18n.locale']('locale');
+                returnedHeaders = installRestDefaultHeaderMapper.calls[0].args[0](headers);
+            }));
+
+            it('then accept-language header is broadcasted locale', function() {
+                expect(headers['accept-language']).toEqual('locale');
+            });
+
+            it('then returned headers are source headers', function() {
+                expect(returnedHeaders).toEqual(headers);
+            });
+        });
+
+    })
+
     describe('i18nMessageReader', function() {
         var reader;
         var sockJS;
