@@ -1,13 +1,13 @@
 angular.module('i18n.gateways', [])
     .factory('i18nMessageReader', ['sockJS', I18nMessageReaderFactory])
-    .factory('i18nMessageWriter', ['restServiceHandler', 'topicRegistry', I18nMessageWriterFactory])
+    .factory('i18nMessageWriter', ['config', 'restServiceHandler', I18nMessageWriterFactory])
     .run(['installRestDefaultHeaderMapper', 'topicRegistry', function(installRestDefaultHeaderMapper, topicRegistry) {
         var locale = 'default';
         topicRegistry.subscribe('i18n.locale', function(msg) {
             locale = msg;
         });
         installRestDefaultHeaderMapper(function(headers) {
-            headers['accept-language'] = locale;
+            if (!headers['accept-language']) headers['accept-language'] = locale;
             return headers;
         })
     }])
@@ -32,12 +32,7 @@ function I18nMessageReaderFactory(sockJS) {
     }
 }
 
-function I18nMessageWriterFactory(restServiceHandler, topicRegistry) {
-    var baseUri = '';
-    topicRegistry.subscribe('config.initialized', function (config) {
-        baseUri = config.baseUri || '';
-    });
-
+function I18nMessageWriterFactory(config, restServiceHandler) {
     return function (ctx, presenter) {
         var payload = {
             key: ctx.key,
@@ -47,7 +42,7 @@ function I18nMessageWriterFactory(restServiceHandler, topicRegistry) {
 
         presenter.params = {
             method: 'POST',
-            url: baseUri + 'api/i18n/translate',
+            url: (config.baseUri || '') + 'api/i18n/translate',
             data: payload,
             withCredentials: true
         };

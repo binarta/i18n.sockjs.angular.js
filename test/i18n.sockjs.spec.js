@@ -1,6 +1,14 @@
 describe('i18n.sockjs.js', function() {
     var topicRegistryMock;
     var topicMessageDispatcher;
+    var config;
+
+    beforeEach(function () {
+        config = {};
+        module(function ($provide) {
+            $provide.value('config', config);
+        });
+    });
 
     beforeEach(module('rest.client'));
     beforeEach(module('i18n.gateways'));
@@ -52,7 +60,19 @@ describe('i18n.sockjs.js', function() {
             });
         });
 
-    })
+        describe('given locale is already on header', function () {
+            beforeEach(inject(function(installRestDefaultHeaderMapper) {
+                headers = {
+                    'accept-language': 'foo'
+                };
+                returnedHeaders = installRestDefaultHeaderMapper.calls[0].args[0](headers);
+            }));
+
+            it('do not override with default locale', function () {
+                expect(headers['accept-language']).toEqual('foo');
+            });
+        });
+    });
 
     describe('i18nMessageReader', function() {
         var reader;
@@ -104,7 +124,6 @@ describe('i18n.sockjs.js', function() {
     });
 
     describe('writer', function () {
-        var config;
         var writer;
         var code = 'translation.code';
         var translation = 'translation message';
@@ -127,7 +146,6 @@ describe('i18n.sockjs.js', function() {
         var presenter;
 
         beforeEach(inject(function (i18nMessageWriter, restServiceHandler) {
-            config = {};
             rest = restServiceHandler;
             writer = i18nMessageWriter;
             receivedSuccess = false;
@@ -137,10 +155,6 @@ describe('i18n.sockjs.js', function() {
                 success:onSuccess
             }
         }));
-
-        it('subscribes for config.initialized notifications', function () {
-            expect(topicRegistryMock['config.initialized']).toBeDefined();
-        });
 
         function expectRestCallFor(ctx) {
             expect(rest.calls[0].args[0].params).toEqual(ctx);
@@ -211,17 +225,12 @@ describe('i18n.sockjs.js', function() {
         describe('with baseuri', function () {
             beforeEach(function () {
                 config.baseUri = 'http://host/context/';
-                topicRegistryMock['config.initialized'](config);
             });
 
             testHttpCallsWithPrefix('http://host/context/');
         });
 
         describe('without baseUri', function () {
-            beforeEach(function () {
-                topicRegistryMock['config.initialized'](config);
-            });
-
             testHttpCallsWithPrefix('');
         });
     })
