@@ -1,4 +1,4 @@
-angular.module('i18n.gateways', [])
+angular.module('i18n.gateways', ['binarta.sockjs', 'config', 'rest.client', 'notifications'])
     .factory('i18nMessageReader', ['sockJS', I18nMessageReaderFactory])
     .factory('i18nMessageWriter', ['config', 'restServiceHandler', I18nMessageWriterFactory])
     .run(['installRestDefaultHeaderMapper', 'topicRegistry', function(installRestDefaultHeaderMapper, topicRegistry) {
@@ -10,8 +10,7 @@ angular.module('i18n.gateways', [])
             if (!headers['accept-language']) headers['accept-language'] = locale;
             return headers;
         })
-    }])
-;
+    }]);
 
 function I18nMessageReaderFactory(sockJS) {
     var counter = 0;

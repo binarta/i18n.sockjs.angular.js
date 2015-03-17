@@ -1,23 +1,34 @@
+angular.module('binarta.sockjs', [])
+    .factory('sockJS', [SockJSFactory]);
+
+function SockJSFactory() {
+    var callback;
+    return {
+        callback: function() {return callback},
+        send: function(data) {
+            this.data = data;
+            return {
+                then: function(cb) {
+                    callback = cb;
+                }
+            }
+        }
+    }
+}
+
 describe('i18n.sockjs.js', function() {
     var topicRegistryMock;
     var topicMessageDispatcher;
     var config;
 
-    beforeEach(function () {
-        config = {};
-        module(function ($provide) {
-            $provide.value('config', config);
-        });
-    });
-
     beforeEach(module('rest.client'));
     beforeEach(module('i18n.gateways'));
     beforeEach(module('notifications'));
-    beforeEach(module('sockjs.mock'));
 
-    beforeEach(inject(function(_topicRegistryMock_, _topicMessageDispatcher_) {
+    beforeEach(inject(function(_topicRegistryMock_, _topicMessageDispatcher_, _config_) {
         topicRegistryMock = _topicRegistryMock_;
         topicMessageDispatcher = _topicMessageDispatcher_;
+        config = _config_;
     }));
 
     describe('on module load', function() {
@@ -235,21 +246,3 @@ describe('i18n.sockjs.js', function() {
         });
     })
 });
-
-angular.module('sockjs.mock', [])
-    .factory('sockJS', [SockJSFactory]);
-
-function SockJSFactory() {
-    var callback;
-    return {
-        callback: function() {return callback},
-        send: function(data) {
-            this.data = data;
-            return {
-                then: function(cb) {
-                    callback = cb;
-                }
-            }
-        }
-    }
-}
