@@ -208,7 +208,10 @@ describe('i18n.sockjs.js', function() {
                             method:'POST',
                             url:'api/i18n/translate',
                             data:{key: code, message: translation, namespace:namespace},
-                            withCredentials:true
+                            withCredentials:true,
+                            headers: {
+                                'accept-language': locale
+                            }
                         });
                     });
                 });
