@@ -1,17 +1,20 @@
 {
-    "name": "binarta.i18n.sockjs.angular",
-    "main": "./src/i18n.sockjs.js",
-    "dependencies": {
-      "angular": "1.3.*",
-      "binarta.i18n.angular": "1.*.*",
-      "binarta.i18n.over.sockjs.angular": "0.*.*"
-    },
-    "devDependencies": {
-    },
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "bower_components",
-        "test"
-    ]
+  "name": "binarta.i18n.sockjs.angular",
+  "main": [
+    "./src/i18n.sockjs.js",
+    "./sources.json"
+  ],
+  "dependencies": {
+    "binarta.angularx": "0.*.*",
+    "binarta.i18n.angular": "1.*.*",
+    "binarta.i18n.over.sockjs.angular": "0.*.*"
+  },
+  "devDependencies": {
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test"
+  ]
 }

@@ -1,0 +1,5 @@
+{
+  "default": {
+    "i18n.sockjs": "bower_components/binarta.i18n.sockjs.angular/src/i18n.sockjs.js"
+  }
+}
